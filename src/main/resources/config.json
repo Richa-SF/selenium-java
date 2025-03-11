@@ -1,0 +1,10 @@
+{
+  "environments": {
+    "qa": {
+      "url": "https://login.salesforce.com/",
+      "username": "richachaturvedi14@brave-otter-gm23rf.com",
+      "password": "Salesforce@1234",
+      "homePageUrl": "https://brave-otter-gm23rf-dev-ed.trailblaze.lightning.force.com/lightning/page/home"
+  }
+                  }
+}
