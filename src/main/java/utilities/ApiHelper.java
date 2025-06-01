@@ -9,7 +9,7 @@ import java.util.Map;
 
 public class ApiHelper {
     private static final String INSTANCE_URL = ConfigManager.getUrl("qa");  // Fetch from config
-    private static final String API_VERSION = "v59.0";  // Keep it configurable if needed
+    private static final String API_VERSION = ConfigManager.getApiv("qa");  //
 
     /**
      * Creates a case in Salesforce via REST API.
@@ -30,7 +30,12 @@ public class ApiHelper {
         requestBody.put("Origin", origin);
         requestBody.put("Status", status);
         requestBody.put("Priority", priority);
-        requestBody.put("ContactId", contactId);  // Ensure it's a valid ContactId
+     //   requestBody.put("ContactId", contactId);  // Ensure it's a valid ContactId
+      /*  if (contactId != null && !contactId.isEmpty()) {
+            requestBody.put("ContactId", contactId);
+        }*/
+        String requestUrl = INSTANCE_URL + "/services/data/" + API_VERSION + "/sobjects/Case";
+        System.out.println("DEBUG: Attempting to POST to URL: " + requestUrl);
 
         Response response = RestAssured
                 .given()

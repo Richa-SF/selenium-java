@@ -23,6 +23,10 @@ public class ConfigManager {
         return config.get("environments").get(environment).get("url").asText();
     }
 
+    public static String getApiv(String environment) {
+        return config.get("environments").get(environment).get("api_version").asText();
+    }
+
     public static String getUsername(String environment) {
         return config.get("environments").get(environment).get("username").asText();
     }
@@ -32,5 +36,22 @@ public class ConfigManager {
     }
     public static String gethomePageUrl(String environment) {
         return config.get("environments").get(environment).get("homePageUrl").asText();
+    }
+
+    // --- NEW METHODS ADDED ---
+    public static String getLoginUrl(String environment) {
+        return config.get("environments").get(environment).get("loginUrl").asText();
+    }
+
+    public static String getClientId(String environment) {
+        return config.get("environments").get(environment).get("clientId").asText();
+    }
+
+    public static String getClientSecret(String environment) {
+        return config.get("environments").get(environment).get("clientSecret").asText();
+    }
+
+    public static String getSecurityToken(String environment) {
+        return config.get("environments").get(environment).get("securityToken").asText();
     }
 }
