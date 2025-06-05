@@ -1,3 +1,0 @@
-Navigating to: https://brave-otter-gm23rf-dev-ed.trailblaze.my.salesforce.com
-Clicking element
-Navigating to: https://brave-otter-gm23rf-dev-ed.trailblaze.lightning.force.com/lightning/page/home
