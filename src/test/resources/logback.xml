@@ -1,0 +1,41 @@
+<!-- NEW: Logback configuration for console, file, and Allure logging -->
+<configuration>
+    <!-- NEW: Console Appender for terminal output -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- NEW: File Appender for logging to target/logs/test.log -->
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>target/logs/test.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <!-- NEW: Roll over daily or when file reaches 10MB -->
+            <fileNamePattern>target/logs/test-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <maxFileSize>10MB</maxFileSize>
+            <maxHistory>30</maxHistory>
+            <totalSizeCap>1GB</totalSizeCap>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- NEW: Allure Appender for attaching logs to Allure reports -->
+    <appender name="ALLURE" class="io.qameta.allure.logback.AllureLogbackAppender"/>
+
+    <!-- NEW: Root Logger configuration -->
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="FILE"/>
+        <appender-ref ref="ALLURE"/>
+    </root>
+
+    <!-- NEW: Logger for com.tests package with DEBUG level -->
+    <logger name="com.tests" level="DEBUG" additivity="false">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="FILE"/>
+        <appender-ref ref="ALLURE"/>
+    </logger>
+</configuration>

@@ -10,7 +10,7 @@ Feature: Login functionality
 
 # Scenario: Mulitselect picklist
  # Given I open the select page
- #When I select one values
+ #When I select one value
  # When I select date
 
 

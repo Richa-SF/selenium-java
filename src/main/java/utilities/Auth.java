@@ -1,38 +1,34 @@
 package utilities;
-
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.util.HashMap;
 import java.util.Map;
-
 public class Auth {
-    private static final String ENVIRONMENT = "qa"; // Define environment once for consistency
+    private static final Logger logger = LoggerFactory.getLogger(Auth.class);
+    private static final String ENVIRONMENT = "qa";
 
     public static String getAccessToken() {
-        // Fetch ALL credentials from ConfigManager for consistency
-        String loginUrl = ConfigManager.getLoginUrl(ENVIRONMENT); // NOW FROM CONFIG
-        String clientId = ConfigManager.getClientId(ENVIRONMENT);   // NOW FROM CONFIG
-        String clientSecret = ConfigManager.getClientSecret(ENVIRONMENT); // NOW FROM CONFIG
+        String loginUrl = ConfigManager.getLoginUrl(ENVIRONMENT);
+        String clientId = ConfigManager.getClientId(ENVIRONMENT);
+        String clientSecret = ConfigManager.getClientSecret(ENVIRONMENT);
         String username = ConfigManager.getUsername(ENVIRONMENT);
         String password = ConfigManager.getPassword(ENVIRONMENT);
-        String securityToken = ConfigManager.getSecurityToken(ENVIRONMENT); // NOW FROM CONFIG
+        String securityToken = ConfigManager.getSecurityToken(ENVIRONMENT);
 
         Map<String, String> authParams = new HashMap<>();
         authParams.put("grant_type", "password");
         authParams.put("client_id", clientId);
         authParams.put("client_secret", clientSecret);
         authParams.put("username", username);
-        authParams.put("password", password + securityToken); // Always combine!
+        authParams.put("password", password + securityToken);
 
-        System.out.println("--- Auth Request Details ---");
-        System.out.println("URL: " + loginUrl);
-        System.out.println("Client ID Used: " + clientId);
-        System.out.println("Username Used: " + username);
-        System.out.println("DEBUG: Combined Password String being sent: " + clientSecret);
-        System.out.println("Secret: " + (password + securityToken));
-
-        // Do NOT print full password/token in console for security!
-        System.out.println("--------------------------");
+        logger.debug("--- Auth Request Details ---");
+        logger.debug("URL: {}", loginUrl);
+        logger.debug("Client ID Used: {}", clientId);
+        logger.debug("Username Used: {}", username);
+        logger.debug("--------------------------");
 
         Response response = RestAssured
                 .given()
@@ -41,12 +37,11 @@ public class Auth {
                 .post(loginUrl);
 
         if (response.getStatusCode() == 200) {
-            System.out.println("--- Auth: Access Token Obtained Successfully! ---");
-            System.out.println("✅ Access Token Retrieved Successfully.");
+            logger.info("Access Token Retrieved Successfully");
             return response.jsonPath().getString("access_token");
         } else {
             String errorBody = response.getBody().asString();
-            System.err.println("--- Auth: Failed to get access token. Status: " + response.getStatusCode() + ", Body: " + errorBody + " ---");
+            logger.error("Failed to get access token. Status: {}, Body: {}", response.getStatusCode(), errorBody);
             throw new RuntimeException("Failed to get access token: " + errorBody);
         }
     }

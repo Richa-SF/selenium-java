@@ -1,53 +1,67 @@
 package com.tests.stepDefinitions;
-
+import com.tests.pages.LoginPage;
+import com.tests.pages.SelPracticePage;
+import filter.LoggingFilter;
 import io.cucumber.java.After;
 import io.cucumber.java.Before;
-import io.cucumber.java.en.*;
-import org.openqa.selenium.*;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.Select;
+import io.cucumber.java.Scenario;
+import io.cucumber.java.en.Given;
+import io.cucumber.java.en.Then;
+import io.cucumber.java.en.When;
+import io.qameta.allure.Allure;
+import io.qameta.allure.Step;
+import org.openqa.selenium.OutputType;
+import org.openqa.selenium.TakesScreenshot;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.Assert;
-import com.tests.pages.LoginPage;
 import utilities.ApiHelper;
 import utilities.ConfigManager;
 import utilities.DriverManager;
+import utilities.ScenarioContext;
 
 import java.time.Duration;
-import java.util.List;
+import java.util.Arrays;
 
 public class LoginSteps {
-//    WebDriver driver = DriverManager.getDriver();
-//    LoginPage loginPage = new LoginPage(driver);
-    private static String createdCaseId;
-
+    private static final Logger logger = LoggerFactory.getLogger(LoginSteps.class);
     private WebDriver driver;
     private LoginPage loginPage;
+    private SelPracticePage selPracticePage;
     private WebDriverWait wait;
+    private LoggingFilter loggingFilter; // FIXED: Correctly declared
+    private String createdCaseId; // Stores caseId for API steps
+
     @Before
-    public void setup() {
-        driver = DriverManager.getDriver(); // Get a new driver for each scenario
+    public void setup(Scenario scenario) {
+        ScenarioContext.setScenario(scenario);
+        logger.info("Starting scenario: {}", scenario.getName());
+        driver = DriverManager.getDriver();
+        wait = new WebDriverWait(driver, Duration.ofSeconds(5));
+        loggingFilter = new LoggingFilter(); // FIXED: Correct initialization
         loginPage = new LoginPage(driver);
-        wait = new WebDriverWait(driver, Duration.ofSeconds(20)); // Initialize WebDriverWait here
+        selPracticePage = new SelPracticePage(driver);
     }
 
     @After
-    public void teardown() {
-        DriverManager.quitDriver(); // Quit the driver after each scenario
+    public void afterScenario() {
+        if (driver != null) {
+            if (ScenarioContext.isScenarioFailed() || ScenarioContext.getScenario().isFailed()) {
+                logger.info("Scenario failed: {}", ScenarioContext.getScenario().getName());
+                captureScreenshot("Scenario Failed: " + ScenarioContext.getScenario().getName());
+                loggingFilter.attachLogsToAllure("UI Logs: " + ScenarioContext.getScenario().getName());
+            }
+            DriverManager.quitDriver();
+            logger.info("Completed scenario: {}", ScenarioContext.getScenario().getName());
+            ScenarioContext.reset();
+        }
     }
+
     @Given("I open the login page")
     public void i_open_the_login_page() {
         driver.get("https://example.com/login");
-    }
-
-    @When("I enter valid credentials")
-    public void i_enter_valid_credentials() {
-        // Add code to enter credentials
-    }
-
-    @Then("I should be redirected to the home page")
-    public void i_should_be_redirected_to_the_home_page() {
-        // Add assertions
     }
 
     @Given("I open the select page")
@@ -55,77 +69,51 @@ public class LoginSteps {
         driver.get("https://www.tutorialspoint.com/selenium/practice/select-menu.php");
     }
 
-    @When("I select one values")
-    public void i_multi_select_values() {
-    WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(20));
-       WebElement picklist = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//select[@class='form-select']")));
-        picklist.click();
-        Select sel=new Select(picklist);
-        sel.selectByVisibleText("Other");
+    @When("I select one value")
+    public void i_select_one_value() {
+        selPracticePage.selectSingleValue("Other");
     }
 
     @When("I select date")
-    public void i_select_date(){
-       // WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(20));
-        WebElement widgetButton= wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//button[contains(text(),'Widget')])")));
-        widgetButton.click();
-        //a[contains(text(),'Date Picker')]
-        WebElement datePicker=wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//a[contains(text(),'Date Picker')]")));
-        datePicker.click();
-        WebElement selectDate=wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//div[text()='Select Date']/following-sibling::div")));
-        selectDate.click();
-        String targetMonth="August 2025";
-        String targetDate="1";
-
-
+    public void i_select_date() {
+        selPracticePage.selectDate("August 2025", "1");
     }
 
-    //
-@When("I select multi values")
-public void i_select_multi_values() {
-    // Wait for the input field to be visible
-    WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(20));
-    JavascriptExecutor js = (JavascriptExecutor) driver;
+    @When("I select multi values")
+    public void i_select_multi_values() {
+        selPracticePage.selectMultiValues(Arrays.asList("Books", "Movies, Music & Games"));
+    }
 
-    // Locate the input element (which triggers the multi-select dropdown)
-    WebElement multiSelectInput = wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//input[@id='demo-multiple-select-input']")));
-    js.executeScript("arguments[0].click();", multiSelectInput);
-
-    // Click on the input field to open the dropdown
-    multiSelectInput.click();
-
-    // Wait for the dropdown options to appear (you might need to adjust this based on the actual dropdown structure)
-    List<WebElement> options = wait.until(ExpectedConditions.visibilityOfAllElementsLocatedBy(By.xpath("//ul[@id='select-options']//li")));
-
-    // Loop through the options and select the desired ones
-    for (WebElement option : options) {
-        String optionText = option.getText();
-        if (optionText.equals("Books") || optionText.equals("Movies, Music & Games")) {
-            option.click();
+    @Given("I am on homepage of salesforce {string}")
+    @Step("Navigating to Salesforce homepage for environment: {0}")
+    public void i_am_on_homepage_of_salesforce(String env) {
+        try {
+            logger.info("Navigating to Salesforce environment: {}", env);
+            String url = ConfigManager.getUrl(env);
+            driver.get(url);
+            loginPage.enterUsername(ConfigManager.getUsername(env));
+            loginPage.enterPassword(ConfigManager.getPassword(env));
+            loginPage.clickLoginButton();
+            driver.get(ConfigManager.gethomePageUrl(env));
+        } catch (Exception e) {
+            logger.error("UI error: {}", e.getMessage());
+            ScenarioContext.markScenarioFailed();
+            throw e;
         }
     }
-}
-    @Given("I am on homepage of salesforce {string}")
-    public void I_am_on_homepage_of_salesforce(String env){
-        String url = ConfigManager.getUrl(env);  // Fetch URL from config
-        String homePageUrl = ConfigManager.gethomePageUrl(env);  // Fetch URL from config
 
-        driver.get(url);
-        String username = ConfigManager.getUsername(env); // Fetch username
-        String password = ConfigManager.getPassword(env); // Fetch password
-        String homeUrl = ConfigManager.gethomePageUrl(env); // Fetch password
-
-        loginPage.enterUsername(username);
-        loginPage.enterPassword(password);
-        loginPage.clickLoginButton();
-        driver.get(homeUrl);
-    }
     @When("I create a new case with subject {string} and description {string}")
+    @Step("Creating case with subject: {0}")
     public void i_create_a_new_case_with_subject_and_description(String subject, String description) {
-        createdCaseId = ApiHelper.createCase(subject, description, "Web", "New", "High", "0035g00000ABCDE");
-        System.out.println("Created Case ID: " + createdCaseId);
-        Assert.fail("Intentional failure to test screenshot capability."); // Add this line
-
+        try {
+            logger.info("Creating case with subject: {}", subject);
+            createdCaseId = ApiHelper.createCase(subject, description, "Web", "New", "High", "0035g00000ABCDE");
+            logger.info("Created case with ID: {}", createdCaseId);
+        } catch (Exception e) {
+            logger.error("API error: {}", e.getMessage());
+            ScenarioContext.markScenarioFailed();
+            throw e;
+        }
     }
 
     @Then("The case should be created successfully")
@@ -133,7 +121,9 @@ public void i_select_multi_values() {
         Assert.assertNotNull("Case ID should not be null", createdCaseId);
     }
 
-
-
+    private void captureScreenshot(String name) {
+        logger.info("Capturing screenshot: {}", name);
+        byte[] screenshot = ((TakesScreenshot) driver).getScreenshotAs(OutputType.BYTES);
+        Allure.addAttachment(name, "image/png", new java.io.ByteArrayInputStream(screenshot), ".png");
+    }
 }
-
