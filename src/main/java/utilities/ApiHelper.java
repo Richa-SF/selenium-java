@@ -11,8 +11,8 @@ import java.util.Map;
 
 public class ApiHelper {
     private static final Logger logger = LoggerFactory.getLogger(ApiHelper.class);
-    private static final String INSTANCE_URL = ConfigManager.getUrl("qa");
-    private static final String API_VERSION = ConfigManager.getApiv("qa");
+    private static final String INSTANCE_URL = ConfigManager.getUrl();
+    private static final String API_VERSION = ConfigManager.getApiVersion();
 
     public static String createCase(String subject, String description, String origin, String status, String priority, String contactId) {
         String accessToken = Auth.getAccessToken();

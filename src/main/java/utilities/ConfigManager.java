@@ -1,60 +1,67 @@
 package utilities;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import java.io.File;
+
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
 
 public class ConfigManager {
     private static final Logger logger = LoggerFactory.getLogger(ConfigManager.class);
-    private static JsonNode config;
-
+    private static final Properties properties = new Properties();
     static {
-        try {
-            File configFile = new File("src/main/resources/config.json");
-            ObjectMapper objectMapper = new ObjectMapper();
-            config = objectMapper.readTree(configFile);
-            logger.info("Configuration loaded successfully");
+        try (InputStream input = new FileInputStream("src/main/resources/config.properties")) {
+            properties.load(input);
+            logger.info("Configuration loaded successfully from config.properties");
         } catch (IOException e) {
             logger.error("Failed to load configuration file", e);
             throw new RuntimeException("Failed to load configuration file", e);
         }
     }
-
-    public static String getUrl(String environment) {
-        return config.get("environments").get(environment).get("url").asText();
+    // Generic getter
+    private static String getProperty(String key) {
+        String value = properties.getProperty(key);
+        if (value == null) {
+            logger.warn("Property key '{}' not found in configuration", key);
+        }
+        return value;
     }
 
-    public static String getApiv(String environment) {
-        return config.get("environments").get(environment).get("api_version").asText();
+    public static String getUrl() {
+        return getProperty("url");
     }
 
-    public static String getUsername(String environment) {
-        return config.get("environments").get(environment).get("username").asText();
+    public static String getApiVersion() {
+        return getProperty("api_version");
     }
 
-    public static String getPassword(String environment) {
-        return config.get("environments").get(environment).get("password").asText();
+    public static String getUsername() {
+        return getProperty("username");
     }
 
-    public static String gethomePageUrl(String environment) {
-        return config.get("environments").get(environment).get("homePageUrl").asText();
+    public static String getPassword() {
+        return getProperty("password");
     }
 
-    public static String getLoginUrl(String environment) {
-        return config.get("environments").get(environment).get("loginUrl").asText();
+    public static String getHomePageUrl() {
+        return getProperty("homePageUrl");
     }
 
-    public static String getClientId(String environment) {
-        return config.get("environments").get(environment).get("clientId").asText();
+    public static String getLoginUrl() {
+        return getProperty("loginUrl");
     }
 
-    public static String getClientSecret(String environment) {
-        return config.get("environments").get(environment).get("clientSecret").asText();
+    public static String getClientId() {
+        return getProperty("clientId");
     }
 
-    public static String getSecurityToken(String environment) {
-        return config.get("environments").get(environment).get("securityToken").asText();
+    public static String getClientSecret() {
+        return getProperty("clientSecret");
+    }
+
+    public static String getSecurityToken() {
+        return getProperty("securityToken");
     }
 }

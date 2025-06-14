@@ -89,12 +89,12 @@ public class LoginSteps {
     public void i_am_on_homepage_of_salesforce(String env) {
         try {
             logger.info("Navigating to Salesforce environment: {}", env);
-            String url = ConfigManager.getUrl(env);
+            String url = ConfigManager.getUrl();
             driver.get(url);
-            loginPage.enterUsername(ConfigManager.getUsername(env));
-            loginPage.enterPassword(ConfigManager.getPassword(env));
+            loginPage.enterUsername(ConfigManager.getUsername());
+            loginPage.enterPassword(ConfigManager.getPassword());
             loginPage.clickLoginButton();
-            driver.get(ConfigManager.gethomePageUrl(env));
+            driver.get(ConfigManager.getHomePageUrl());
         } catch (Exception e) {
             logger.error("UI error: {}", e.getMessage());
             ScenarioContext.markScenarioFailed();

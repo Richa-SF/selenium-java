@@ -1,0 +1,27 @@
+# Ignore Allure report and results
+allure-results/
+allure-report/
+
+# Ignore screenshots/logs
+*.png
+*.log
+
+# IntelliJ IDEA project files
+.idea/
+*.iml
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Maven target directory
+/target/
+
+# Logs
+*.log
+
+# config.json — if it contains API keys or secrets
+src/main/resources/config.json
+
+# Test output files
+test-output/

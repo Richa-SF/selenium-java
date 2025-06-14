@@ -1,0 +1,5 @@
+"DESCRIPTION","DURATION IN MS","NAME","PARENT SUITE","START TIME","STATUS","STOP TIME","SUB SUITE","SUITE","TEST CLASS","TEST METHOD"
+"","35944","Runs Cucumber Scenarios","CucumberTestSuite","Mon Jun 02 13:03:44 IST 2025","failed","Mon Jun 02 13:04:20 IST 2025","com.tests.runner.TestRunner","CucumberTest","com.tests.runner.TestRunner","runScenario"
+"","0","setUpClass","Default Suite","Mon May 26 17:35:45 IST 2025","broken","Mon May 26 17:35:45 IST 2025","com.tests.runner.TestRunner","selenium-java","com.tests.runner.TestRunner","setUpClass"
+"","41334","Login to salesforce","","Thu Jun 05 22:51:32 IST 2025","passed","Thu Jun 05 22:52:13 IST 2025","","Login functionality","Login to salesforce",""
+"","23469","Runs Cucumber Scenarios","Default Suite","Wed May 21 18:18:09 IST 2025","broken","Wed May 21 18:18:33 IST 2025","runner.TestRunner","selenium-java","runner.TestRunner","runScenario"

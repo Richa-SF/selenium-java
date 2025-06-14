@@ -10,12 +10,12 @@ public class Auth {
     private static final String ENVIRONMENT = "qa";
 
     public static String getAccessToken() {
-        String loginUrl = ConfigManager.getLoginUrl(ENVIRONMENT);
-        String clientId = ConfigManager.getClientId(ENVIRONMENT);
-        String clientSecret = ConfigManager.getClientSecret(ENVIRONMENT);
-        String username = ConfigManager.getUsername(ENVIRONMENT);
-        String password = ConfigManager.getPassword(ENVIRONMENT);
-        String securityToken = ConfigManager.getSecurityToken(ENVIRONMENT);
+        String loginUrl = ConfigManager.getLoginUrl();
+        String clientId = ConfigManager.getClientId();
+        String clientSecret = ConfigManager.getClientSecret();
+        String username = ConfigManager.getUsername();
+        String password = ConfigManager.getPassword();
+        String securityToken = ConfigManager.getSecurityToken();
 
         Map<String, String> authParams = new HashMap<>();
         authParams.put("grant_type", "password");

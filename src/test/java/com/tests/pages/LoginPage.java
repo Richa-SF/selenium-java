@@ -1,22 +1,17 @@
 package com.tests.pages;
 
+import com.tests.pages.BasePage;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.CacheLookup;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.time.Duration;
+public class LoginPage extends BasePage {
 
-public class LoginPage {
-    private static final Logger logger = LoggerFactory.getLogger(LoginPage.class);
-    @SuppressWarnings("unused")
-    private WebDriver driver;
-    private WebDriverWait wait;
+   // private static final Logger logger = LoggerFactory.getLogger(LoginPage.class);
 
     @FindBy(id = "username")
     @CacheLookup
@@ -35,29 +30,28 @@ public class LoginPage {
     private WebElement appLaunchButton;
 
     public LoginPage(WebDriver driver) {
-        this.driver = driver;
-        this.wait = new WebDriverWait(driver, Duration.ofSeconds(20));
+        super(driver); // Calls BasePage constructor
         PageFactory.initElements(driver, this);
         logger.debug("Initialized LoginPage");
     }
 
     public void enterUsername(String username) {
         logger.debug("Entering username: {}", username);
-        wait.until(ExpectedConditions.visibilityOf(usernameField)).sendKeys(username);
+        type(usernameField, username); // BasePage method
     }
 
     public void enterPassword(String password) {
         logger.debug("Entering password");
-        wait.until(ExpectedConditions.visibilityOf(passwordField)).sendKeys(password);
+        type(passwordField, password); // BasePage method
     }
 
     public void clickLoginButton() {
         logger.debug("Clicking login button");
-        wait.until(ExpectedConditions.elementToBeClickable(loginButton)).click();
+        click(loginButton); // BasePage method
     }
 
     public void clickAppLaunchButton() {
         logger.debug("Clicking app launch button");
-        wait.until(ExpectedConditions.elementToBeClickable(appLaunchButton)).click();
+        click(appLaunchButton); // BasePage method
     }
 }

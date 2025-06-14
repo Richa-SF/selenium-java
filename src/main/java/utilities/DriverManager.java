@@ -13,22 +13,22 @@ public class DriverManager {
     private static final ThreadLocal<WebDriver> driver = new ThreadLocal<>();
     private static final Logger logger = LoggerFactory.getLogger(DriverManager.class);
 
+
     public static WebDriver getDriver() {
         if (driver.get() == null) {
-            logger.info("Initializing ChromeDriver for thread: {}", Thread.currentThread().getId());
-            // Clear WebDriverManager cache to avoid using outdated ChromeDriver
-            WebDriverManager.chromedriver().clearDriverCache().clearResolutionCache();
-            // Force WebDriverManager to download ChromeDriver for Chrome 137
-            WebDriverManager.chromedriver().browserVersion("137").setup();
-            // Log the ChromeDriver version being used (optional, for debugging)
-            String chromeDriverPath = System.getProperty("webdriver.chrome.driver");
-            logger.info("Using ChromeDriver at: {}", chromeDriverPath);
-            WebDriver rawDriver = new ChromeDriver();
-            LoggingFilter loggingFilter = new LoggingFilter();
-            WebDriver decoratedDriver = new EventFiringDecorator<>(loggingFilter).decorate(rawDriver);
-            driver.set(decoratedDriver);
-            driver.get().manage().window().maximize();
+            logger.info("Initializing new ChromeDriver for thread: {}", Thread.currentThread().getId());
+
+            // 1. Automatically downloads and sets up the chromedriver executable
+            WebDriverManager.chromedriver().setup();
+
+            // 2. Creates a new Chrome browser instance
+            WebDriver webDriver = new ChromeDriver();
+            webDriver.manage().window().maximize();
+
+            // 3. Stores this driver instance in our ThreadLocal variable
+            driver.set(webDriver);
         }
+        // Returns the driver for the current thread
         return driver.get();
     }
 
