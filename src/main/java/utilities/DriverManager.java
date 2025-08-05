@@ -1,9 +1,9 @@
 
-        package utilities;
-
+package utilities;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.events.EventFiringDecorator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,9 +20,10 @@ public class DriverManager {
 
             // 1. Automatically downloads and sets up the chromedriver executable
             WebDriverManager.chromedriver().setup();
-
+            ChromeOptions options = new ChromeOptions();
+            options.addArguments("--disable-notifications");
             // 2. Creates a new Chrome browser instance
-            WebDriver webDriver = new ChromeDriver();
+            WebDriver webDriver = new ChromeDriver(options);
             webDriver.manage().window().maximize();
 
             // 3. Stores this driver instance in our ThreadLocal variable
@@ -35,8 +36,8 @@ public class DriverManager {
     public static void quitDriver() {
         if (driver.get() != null) {
             logger.info("Quitting WebDriver for thread: {}", Thread.currentThread().getId());
-            driver.get().quit();
-            driver.remove();
+          //  driver.get().quit();
+            //driver.remove();
         }
     }
 }

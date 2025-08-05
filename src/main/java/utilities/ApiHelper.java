@@ -34,9 +34,18 @@ public class ApiHelper {
                 .post(requestUrl);
 
         if (response.getStatusCode() == 201) {
+            logger.info("Case Created Successfully");
             String caseId = response.jsonPath().getString("id");
-            logger.info("Case Created Successfully: {}", caseId);
-            return caseId;
+
+            String caseDetailsUrl = INSTANCE_URL + "/services/data/" + API_VERSION + "/sobjects/Case/" + caseId;
+            Response getResponse = RestAssured
+                    .given()
+                    .header("Authorization", "Bearer " + accessToken)
+                    .get(caseDetailsUrl);
+            String caseNumber = getResponse.jsonPath().getString("CaseNumber");
+            logger.info("Fetched Case Number");
+
+            return caseNumber;
         } else {
             logger.error("Failed to create case: {}", response.getBody().asString());
             throw new RuntimeException("Failed to create case: " + response.getBody().asString());

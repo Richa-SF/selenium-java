@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ScenarioContext {
+    //an advanced utility for managing per-scenario test data and status,
     private static final Logger logger = LoggerFactory.getLogger(ScenarioContext.class);
     // ThreadLocal to track scenario failure status per thread
     private static final ThreadLocal<Boolean> scenarioFailed = ThreadLocal.withInitial(() -> false);

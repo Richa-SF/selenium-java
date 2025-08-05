@@ -13,7 +13,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import java.util.List;
 import java.time.Duration;
 
-public class SelPracticePage {
+public class SelPracticePage extends BasePage {
     @SuppressWarnings("unused")
     private WebDriver driver;
     private WebDriverWait wait;
@@ -21,7 +21,6 @@ public class SelPracticePage {
     @FindBy(xpath = "//select[@class='form-select']")
     @CacheLookup
     private WebElement selectOneForm;
-
 
     @FindBy(xpath = "//button[contains(text(),'Widget')]")
     @CacheLookup
@@ -52,9 +51,9 @@ public class SelPracticePage {
     private List<WebElement> multiSelectOptions;
 
     public SelPracticePage(WebDriver driver) {
-        this.driver = driver;
-        this.wait = new WebDriverWait(driver, Duration.ofSeconds(20));
+        super(driver); // Calls BasePage constructor
         PageFactory.initElements(driver, this);
+        this.driver = driver;
     }
 
     public void selectSingleValue(String value) {

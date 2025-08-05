@@ -7,6 +7,8 @@ Feature: Login functionality
   Given I am on homepage of salesforce "qa"
   When I create a new case with subject "Test" and description "abc"
   Then The case should be created successfully
+  And I navigate to "Cases" tab
+  Then I search for same "CaseNO"
 
 # Scenario: Mulitselect picklist
  # Given I open the select page

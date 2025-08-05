@@ -5,7 +5,7 @@ import io.cucumber.testng.CucumberOptions;
 
 @CucumberOptions(
         features = "src/test/resources/com/tests/features",
-        glue = "com.tests.stepDefinitions",
+        glue = {"com.tests.stepDefinitions", "com.tests.hooks"},
         plugin = {"pretty", "io.qameta.allure.cucumber7jvm.AllureCucumber7Jvm"}
 )
 public class TestRunner extends AbstractTestNGCucumberTests {

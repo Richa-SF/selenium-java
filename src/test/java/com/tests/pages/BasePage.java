@@ -17,7 +17,6 @@ public class BasePage {
     protected WebDriverWait wait;
     protected JavascriptExecutor jsExecutor;
 
-    // Constructor
     public BasePage(WebDriver driver) {
         this.driver = driver;
         this.wait = new WebDriverWait(driver, Duration.ofSeconds(20));

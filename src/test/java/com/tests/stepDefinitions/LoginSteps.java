@@ -17,47 +17,13 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
-import utilities.ApiHelper;
-import utilities.ConfigManager;
-import utilities.DriverManager;
-import utilities.ScenarioContext;
+import utilities.*;
 
+import java.io.ByteArrayInputStream;
 import java.time.Duration;
 import java.util.Arrays;
 
-public class LoginSteps {
-    private static final Logger logger = LoggerFactory.getLogger(LoginSteps.class);
-    private WebDriver driver;
-    private LoginPage loginPage;
-    private SelPracticePage selPracticePage;
-    private WebDriverWait wait;
-    private LoggingFilter loggingFilter; // FIXED: Correctly declared
-    private String createdCaseId; // Stores caseId for API steps
-
-    @Before
-    public void setup(Scenario scenario) {
-        ScenarioContext.setScenario(scenario);
-        logger.info("Starting scenario: {}", scenario.getName());
-        driver = DriverManager.getDriver();
-        wait = new WebDriverWait(driver, Duration.ofSeconds(5));
-        loggingFilter = new LoggingFilter(); // FIXED: Correct initialization
-        loginPage = new LoginPage(driver);
-        selPracticePage = new SelPracticePage(driver);
-    }
-
-    @After
-    public void afterScenario() {
-        if (driver != null) {
-            if (ScenarioContext.isScenarioFailed() || ScenarioContext.getScenario().isFailed()) {
-                logger.info("Scenario failed: {}", ScenarioContext.getScenario().getName());
-                captureScreenshot("Scenario Failed: " + ScenarioContext.getScenario().getName());
-                loggingFilter.attachLogsToAllure("UI Logs: " + ScenarioContext.getScenario().getName());
-            }
-            DriverManager.quitDriver();
-            logger.info("Completed scenario: {}", ScenarioContext.getScenario().getName());
-            ScenarioContext.reset();
-        }
-    }
+public class LoginSteps extends BaseSteps {
 
     @Given("I open the login page")
     public void i_open_the_login_page() {
@@ -84,46 +50,4 @@ public class LoginSteps {
         selPracticePage.selectMultiValues(Arrays.asList("Books", "Movies, Music & Games"));
     }
 
-    @Given("I am on homepage of salesforce {string}")
-    @Step("Navigating to Salesforce homepage for environment: {0}")
-    public void i_am_on_homepage_of_salesforce(String env) {
-        try {
-            logger.info("Navigating to Salesforce environment: {}", env);
-            String url = ConfigManager.getUrl();
-            driver.get(url);
-            loginPage.enterUsername(ConfigManager.getUsername());
-            loginPage.enterPassword(ConfigManager.getPassword());
-            loginPage.clickLoginButton();
-            driver.get(ConfigManager.getHomePageUrl());
-        } catch (Exception e) {
-            logger.error("UI error: {}", e.getMessage());
-            ScenarioContext.markScenarioFailed();
-            throw e;
-        }
-    }
-
-    @When("I create a new case with subject {string} and description {string}")
-    @Step("Creating case with subject: {0}")
-    public void i_create_a_new_case_with_subject_and_description(String subject, String description) {
-        try {
-            logger.info("Creating case with subject: {}", subject);
-            createdCaseId = ApiHelper.createCase(subject, description, "Web", "New", "High", "0035g00000ABCDE");
-            logger.info("Created case with ID: {}", createdCaseId);
-        } catch (Exception e) {
-            logger.error("API error: {}", e.getMessage());
-            ScenarioContext.markScenarioFailed();
-            throw e;
-        }
-    }
-
-    @Then("The case should be created successfully")
-    public void the_case_should_be_created_successfully() {
-        Assert.assertNotNull("Case ID should not be null", createdCaseId);
-    }
-
-    private void captureScreenshot(String name) {
-        logger.info("Capturing screenshot: {}", name);
-        byte[] screenshot = ((TakesScreenshot) driver).getScreenshotAs(OutputType.BYTES);
-        Allure.addAttachment(name, "image/png", new java.io.ByteArrayInputStream(screenshot), ".png");
-    }
 }
