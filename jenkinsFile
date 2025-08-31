@@ -2,14 +2,13 @@ pipeline {
     agent any
 
     environment {
-        // Jenkins credential ID that stores the config.properties file
+        // Jenkins credential ID for config.properties
         CONFIG_FILE = credentials('SF_CONFIG_FILE')
     }
 
     stages {
         stage('Checkout Code') {
             steps {
-                // Checkout code from repo (Jenkins uses configured SCM)
                 checkout scm
             }
         }
@@ -17,11 +16,11 @@ pipeline {
         stage('Prepare Config') {
             steps {
                 script {
-                    // Ensure resources folder exists
-                    bat 'mkdir -p src/main/resources'
+                    // Create resources folder
+                    bat 'mkdir src\\main\\resources'
 
-                    // Copy config.properties from Jenkins credentials into resources
-                    bat "cp ${CONFIG_FILE} src/main/resources/config.properties"
+                    // Copy config.properties into resources
+                    bat "copy ${CONFIG_FILE} src\\main\\resources\\config.properties"
 
                     echo "✅ Config file prepared at src/main/resources/config.properties"
                 }
@@ -30,7 +29,7 @@ pipeline {
 
         stage('Build & Test') {
             steps {
-                // Clean and run tests with TestNG suite
+                // Run tests with TestNG suite
                 bat 'mvn clean test -DsuiteXmlFile=testng.xml'
             }
         }
@@ -38,17 +37,16 @@ pipeline {
 
     post {
         always {
-            // Archive TestNG reports (they are generated under surefire-reports)
-            testng 'target/surefire-reports/testng-results.xml'
+            // Collect JUnit-compatible TestNG results
+            junit 'target/surefire-reports/*.xml'
 
-            // Optionally archive HTML reports if you generate them
+            // Archive HTML reports if generated
             archiveArtifacts artifacts: 'target/surefire-reports/*.html', allowEmptyArchive: true
         }
 
         success {
             echo "✅ All Selenium + TestNG tests passed successfully."
         }
-
         failure {
             echo "❌ Some tests failed! Please check reports in Jenkins."
         }
