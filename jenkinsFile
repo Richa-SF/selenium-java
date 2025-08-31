@@ -1,0 +1,56 @@
+pipeline {
+    agent any
+
+    environment {
+        // Jenkins credential ID that stores the config.properties file
+        CONFIG_FILE = credentials('SF_CONFIG_FILE')
+    }
+
+    stages {
+        stage('Checkout Code') {
+            steps {
+                // Checkout code from repo (Jenkins uses configured SCM)
+                checkout scm
+            }
+        }
+
+        stage('Prepare Config') {
+            steps {
+                script {
+                    // Ensure resources folder exists
+                    sh 'mkdir -p src/main/resources'
+
+                    // Copy config.properties from Jenkins credentials into resources
+                    sh "cp ${CONFIG_FILE} src/main/resources/config.properties"
+
+                    echo "✅ Config file prepared at src/main/resources/config.properties"
+                }
+            }
+        }
+
+        stage('Build & Test') {
+            steps {
+                // Clean and run tests with TestNG suite
+                sh 'mvn clean test -DsuiteXmlFile=testng.xml'
+            }
+        }
+    }
+
+    post {
+        always {
+            // Archive TestNG reports (they are generated under surefire-reports)
+            junit 'target/surefire-reports/testng-results.xml'
+
+            // Optionally archive HTML reports if you generate them
+            archiveArtifacts artifacts: 'target/surefire-reports/*.html', allowEmptyArchive: true
+        }
+
+        success {
+            echo "✅ All Selenium + TestNG tests passed successfully."
+        }
+
+        failure {
+            echo "❌ Some tests failed! Please check reports in Jenkins."
+        }
+    }
+}
