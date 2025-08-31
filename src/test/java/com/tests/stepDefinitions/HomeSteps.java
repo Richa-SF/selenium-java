@@ -6,11 +6,16 @@ import com.tests.pages.HomePage;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import io.qameta.allure.Step;
+import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.Assert;
 import utilities.ApiHelper;
 import utilities.ConfigManager;
 import utilities.ScenarioContext;
+
+import java.time.Duration;
 
 public class HomeSteps extends BaseSteps {
 
@@ -60,12 +65,18 @@ public class HomeSteps extends BaseSteps {
     }
 
     @Then("I search for same {string}")
-    public void I_search_for(String caseNo) {
-        caseNo = (String) ScenarioContext.getAttribute("caseNumber"); // ✅ match key
+    public void I_search_for(String caseNo) throws InterruptedException {
+        caseNo = (String) ScenarioContext.getAttribute("caseNumber");
         homePage.searchListMethod(caseNo + Keys.ENTER);
-        String actualResult = homePage.searchResultMethod();
+        homePage.searchResultMethod();
+        }
+
+    @Then("I click on case")
+    public void i_click_on_case() {
+        String caseNo = (String) ScenarioContext.getAttribute("caseNumber");
+        homePage.clickOnCaseNumber(caseNo);
+    }
     }
 
 
 
-}

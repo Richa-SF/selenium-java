@@ -9,11 +9,17 @@ Feature: Login functionality
   Then The case should be created successfully
   And I navigate to "Cases" tab
   Then I search for same "CaseNO"
+  Then I click on case
+    Then I get details of case
+    And I click on Edit
+    And I get all values of status
+    Then I select "Escalated"
 
-# Scenario: Mulitselect picklist
- # Given I open the select page
- #When I select one value
- # When I select date
+
+
+
+  Scenario: Successful login with different roles
+    Given I login as "admin"
 
 
 

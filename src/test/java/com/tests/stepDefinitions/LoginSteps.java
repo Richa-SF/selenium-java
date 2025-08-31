@@ -1,29 +1,18 @@
 package com.tests.stepDefinitions;
-import com.tests.pages.LoginPage;
-import com.tests.pages.SelPracticePage;
-import filter.LoggingFilter;
-import io.cucumber.java.After;
-import io.cucumber.java.Before;
-import io.cucumber.java.Scenario;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-import io.qameta.allure.Allure;
-import io.qameta.allure.Step;
-import org.openqa.selenium.OutputType;
-import org.openqa.selenium.TakesScreenshot;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.support.ui.WebDriverWait;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.testng.Assert;
 import utilities.*;
-
-import java.io.ByteArrayInputStream;
-import java.time.Duration;
+import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
 public class LoginSteps extends BaseSteps {
+    private static final String USERS_FILE_PATH = "src/main/resources/users.yaml";
 
     @Given("I open the login page")
     public void i_open_the_login_page() {
@@ -50,4 +39,40 @@ public class LoginSteps extends BaseSteps {
         selPracticePage.selectMultiValues(Arrays.asList("Books", "Movies, Music & Games"));
     }
 
+
+    @Given("I login as {string}")
+    public void i_login_as(String role) throws IOException {
+        // Create an ObjectMapper for YAML files
+        ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
+
+        // Read the YAML file and parse it into a Map
+        Map<String, List<Map<String, String>>> yamlData = mapper.readValue(new File(USERS_FILE_PATH), Map.class);
+        List<Map<String, String>> users = yamlData.get("users");
+
+        String username = null;
+        String password = null;
+
+        // Iterate through the list of users to find the one with the matching role
+        for (Map<String, String> user : users) {
+            if (role.equals(user.get("role"))) {
+                username = user.get("username");
+                password = user.get("password");
+                break;
+            }
+        }
+
+        if (username != null && password != null) {
+            // Use your existing login methods with the data from the YAML file
+            // Based on your HomeSteps, this would look something like this:
+            String url = ConfigManager.getUrl();
+            driver.get(url);
+            loginPage.enterUsername(username);
+            loginPage.enterPassword(password);
+            loginPage.clickLoginButton();
+            // You may need to add additional steps like launching the app.
+        } else {
+            throw new IllegalArgumentException("User role not found in users.yaml: " + role);
+        }
+    }
 }
+

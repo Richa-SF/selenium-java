@@ -1,17 +1,17 @@
-<!-- NEW: Logback configuration for console, file, and Allure logging -->
+<?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-    <!-- NEW: Console Appender for terminal output -->
+
+    <!-- Console Appender: Logs to terminal -->
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
             <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
         </encoder>
     </appender>
 
-    <!-- NEW: File Appender for logging to target/logs/test.log -->
+    <!-- File Appender: Logs to a rotating file in target/logs -->
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>target/logs/test.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
-            <!-- NEW: Roll over daily or when file reaches 10MB -->
             <fileNamePattern>target/logs/test-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
             <maxFileSize>10MB</maxFileSize>
             <maxHistory>30</maxHistory>
@@ -22,20 +22,26 @@
         </encoder>
     </appender>
 
-    <!-- NEW: Allure Appender for attaching logs to Allure reports -->
+    <!-- Optional Allure Appender -->
+    <!-- Uncomment if allure-logback dependency is present in pom.xml -->
+    <!--
     <appender name="ALLURE" class="io.qameta.allure.logback.AllureLogbackAppender"/>
+    -->
 
-    <!-- NEW: Root Logger configuration -->
+    <!-- Root Logger: Apply to all logs -->
     <root level="INFO">
         <appender-ref ref="CONSOLE"/>
         <appender-ref ref="FILE"/>
-        <appender-ref ref="ALLURE"/>
+        <!-- Uncomment below line if ALLURE appender is included -->
+        <!-- <appender-ref ref="ALLURE"/> -->
     </root>
 
-    <!-- NEW: Logger for com.tests package with DEBUG level -->
+    <!-- Application Specific Logger -->
     <logger name="com.tests" level="DEBUG" additivity="false">
         <appender-ref ref="CONSOLE"/>
         <appender-ref ref="FILE"/>
-        <appender-ref ref="ALLURE"/>
+        <!-- Uncomment below line if ALLURE appender is included -->
+        <!-- <appender-ref ref="ALLURE"/> -->
     </logger>
+
 </configuration>

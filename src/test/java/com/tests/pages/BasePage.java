@@ -61,5 +61,6 @@ public class BasePage {
     public void waitForTitle(String title) {
         wait.until(ExpectedConditions.titleContains(title));
     }
+
 }
 

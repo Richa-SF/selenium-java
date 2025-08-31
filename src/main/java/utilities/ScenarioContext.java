@@ -21,13 +21,11 @@ public class ScenarioContext {
     private static final ThreadLocal<Scenario> currentScenario = new ThreadLocal<>();
     // ThreadLocal to store scenario-specific attributes (e.g., caseId) per thread
     private static final ThreadLocal<Map<String, Object>> attributes = ThreadLocal.withInitial(HashMap::new);
-
     // Sets the current Scenario object for the thread
     public static void setScenario(Scenario scenario) {
         logger.debug("Setting scenario: {}", scenario.getName());
         currentScenario.set(scenario);
     }
-
     // Marks the scenario as failed
     public static void markScenarioFailed() {
         logger.warn("Marking scenario as failed");
@@ -49,14 +47,12 @@ public class ScenarioContext {
         logger.debug("Setting attribute: {} = {}", key, value);
         attributes.get().put(key, value);
     }
-
     // Retrieves an attribute (e.g., caseId) from the scenario context
     public static Object getAttribute(String key) {
         Object value = attributes.get().get(key);
         logger.debug("Retrieving attribute: {} = {}", key, value);
         return value;
     }
-
     // Resets the scenario context after each scenario
     public static void reset() {
         logger.debug("Resetting scenario context");

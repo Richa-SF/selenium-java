@@ -1,4 +1,5 @@
 package com.tests.stepDefinitions;
+import com.tests.pages.CasePage;
 import com.tests.pages.HomePage;
 import com.tests.pages.LoginPage;
 import com.tests.pages.SelPracticePage;
@@ -21,4 +22,5 @@ public class BaseSteps {
     protected LoginPage loginPage = new LoginPage(driver);
     protected SelPracticePage selPracticePage = new SelPracticePage(driver);
     protected HomePage homePage = new HomePage(driver);
+    protected CasePage casePage = new CasePage(driver);
 }

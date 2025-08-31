@@ -16,11 +16,10 @@ public class HomePage extends BasePage {
         logger.debug("Initialized HomePage");
     }
         @FindBy(xpath = "//input[contains(@aria-label,'Search this list...')]")
-        @CacheLookup
         private WebElement searchList;
 
    @FindBy(xpath = "//th[@data-label='Case Number']//a[@title]")
-    @CacheLookup
+
     private WebElement searchResult;
 
     public void clickOnTab(String name){
@@ -29,13 +28,20 @@ public class HomePage extends BasePage {
         ((JavascriptExecutor) driver).executeScript("arguments[0].click();", tab);
 
     }
-
+    public void clickOnCaseNumber(String caseNo) {
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30));
+        WebElement caselocator = wait.until(
+                ExpectedConditions.elementToBeClickable(
+                        By.xpath("//table//a[@title='" + caseNo + "']")
+                )
+        );
+        caselocator.click();
+    }
     public void searchListMethod(String value){
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(20));
         WebElement search = wait.until(ExpectedConditions.visibilityOf(searchList));
         search.sendKeys(value, Keys.ENTER);
     }
-
     public String searchResultMethod(){
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(20));
         String caseNo = wait.until(ExpectedConditions.visibilityOf(searchResult)).getText();
