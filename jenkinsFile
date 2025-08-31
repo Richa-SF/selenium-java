@@ -2,7 +2,6 @@ pipeline {
     agent any
 
     environment {
-        // Jenkins credential ID for config.properties
         CONFIG_FILE = credentials('SF_CONFIG_FILE')
     }
 
@@ -16,10 +15,10 @@ pipeline {
         stage('Prepare Config') {
             steps {
                 script {
-                    // Create resources folder
-                    bat 'mkdir src\\main\\resources'
+                    // Create resources folder only if it doesn't exist
+                    bat 'if not exist src\\main\\resources mkdir src\\main\\resources'
 
-                    // Copy config.properties into resources
+                    // Copy config.properties
                     bat "copy ${CONFIG_FILE} src\\main\\resources\\config.properties"
 
                     echo "✅ Config file prepared at src/main/resources/config.properties"
@@ -29,7 +28,6 @@ pipeline {
 
         stage('Build & Test') {
             steps {
-                // Run tests with TestNG suite
                 bat 'mvn clean test -DsuiteXmlFile=testng.xml'
             }
         }
@@ -37,10 +35,10 @@ pipeline {
 
     post {
         always {
-            // Collect JUnit-compatible TestNG results
-            junit 'target/surefire-reports/*.xml'
+            // Publish test results (JUnit-compatible XML from TestNG via Surefire)
+            junit allowEmptyResults: true, testResults: 'target/surefire-reports/*.xml'
 
-            // Archive HTML reports if generated
+            // Archive any HTML reports
             archiveArtifacts artifacts: 'target/surefire-reports/*.html', allowEmptyArchive: true
         }
 
