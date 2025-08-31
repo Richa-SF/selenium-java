@@ -18,10 +18,10 @@ pipeline {
             steps {
                 script {
                     // Ensure resources folder exists
-                    sh 'mkdir -p src/main/resources'
+                    bat 'mkdir -p src/main/resources'
 
                     // Copy config.properties from Jenkins credentials into resources
-                    sh "cp ${CONFIG_FILE} src/main/resources/config.properties"
+                    bat "cp ${CONFIG_FILE} src/main/resources/config.properties"
 
                     echo "✅ Config file prepared at src/main/resources/config.properties"
                 }
@@ -31,7 +31,7 @@ pipeline {
         stage('Build & Test') {
             steps {
                 // Clean and run tests with TestNG suite
-                sh 'mvn clean test -DsuiteXmlFile=testng.xml'
+                bat 'mvn clean test -DsuiteXmlFile=testng.xml'
             }
         }
     }
@@ -39,7 +39,7 @@ pipeline {
     post {
         always {
             // Archive TestNG reports (they are generated under surefire-reports)
-            junit 'target/surefire-reports/testng-results.xml'
+            testng 'target/surefire-reports/testng-results.xml'
 
             // Optionally archive HTML reports if you generate them
             archiveArtifacts artifacts: 'target/surefire-reports/*.html', allowEmptyArchive: true
