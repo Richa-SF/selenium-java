@@ -2,12 +2,12 @@ pipeline {
     agent any
 
     tools {
-       maven 'M3'      // <-- use the actual Maven name configured in Jenkins
-               jdk 'jdk-17'       // Configure JDK in Jenkins with this name
+        maven 'M3'         // <-- Name of Maven configured in Jenkins
+        jdk 'jdk-17'       // <-- Name of JDK configured in Jenkins
     }
 
     environment {
-        CONFIG_FILE = credentials('SF_CONFIG_FILE')
+        CONFIG_FILE = credentials('SF_CONFIG_FILE')  // Your Salesforce config file credential
     }
 
     stages {
@@ -33,18 +33,30 @@ pipeline {
 
         stage('Build & Test') {
             steps {
-                // Use Maven wrapper or Jenkins tool config
+                // Run tests with TestNG suite
                 bat 'mvn -B clean test -DsuiteXmlFile=testng.xml'
+            }
+        }
+
+        stage('Allure Report') {
+            steps {
+                // Generate Allure report in Jenkins
+                allure([
+                    includeProperties: false,
+                    jdk: '',
+                    results: [[path: 'target/allure-results']]
+                ])
             }
         }
     }
 
     post {
         always {
-            // Publish TestNG results (converted to JUnit format by Surefire)
-            junit allowEmptyResults: true, testResults: 'target/surefire-reports/*.xml'
+            // ✅ Archive Allure raw results so they can be reused/downloaded
+            archiveArtifacts artifacts: 'target/allure-results/**', fingerprint: true
 
-            // Archive TestNG HTML reports
+            // ✅ Archive TestNG XML & HTML reports as backup
+            junit allowEmptyResults: true, testResults: 'target/surefire-reports/*.xml'
             archiveArtifacts artifacts: 'target/surefire-reports/*.html', allowEmptyArchive: true
         }
 
@@ -52,7 +64,7 @@ pipeline {
             echo "✅ All Selenium + TestNG tests passed successfully."
         }
         failure {
-            echo "❌ Some tests failed! Please check reports in Jenkins."
+            echo "❌ Some tests failed! Please check Allure report in Jenkins."
         }
     }
 }

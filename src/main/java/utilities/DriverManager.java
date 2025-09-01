@@ -21,6 +21,7 @@ public class DriverManager {
             // 1. Automatically downloads and sets up the chromedriver executable
             WebDriverManager.chromedriver().setup();
             ChromeOptions options = new ChromeOptions();
+            options.addArguments("--headless=new");
             options.addArguments("--disable-notifications");
             // 2. Creates a new Chrome browser instance
             WebDriver webDriver = new ChromeDriver(options);
