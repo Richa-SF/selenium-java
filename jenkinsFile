@@ -1,6 +1,11 @@
 pipeline {
     agent any
 
+    tools {
+        maven 'MAVEN_HOME'   // Make sure you configured Maven in Jenkins (Manage Jenkins > Global Tool Config)
+        jdk 'JDK17'          // Configure JDK in Jenkins with this name
+    }
+
     environment {
         CONFIG_FILE = credentials('SF_CONFIG_FILE')
     }
@@ -15,10 +20,10 @@ pipeline {
         stage('Prepare Config') {
             steps {
                 script {
-                    // Create resources folder only if it doesn't exist
+                    // Ensure resources folder exists
                     bat 'if not exist src\\main\\resources mkdir src\\main\\resources'
 
-                    // Copy config.properties
+                    // Copy config.properties from Jenkins credentials
                     bat "copy ${CONFIG_FILE} src\\main\\resources\\config.properties"
 
                     echo "✅ Config file prepared at src/main/resources/config.properties"
@@ -28,17 +33,18 @@ pipeline {
 
         stage('Build & Test') {
             steps {
-                bat 'mvn clean test -DsuiteXmlFile=testng.xml'
+                // Use Maven wrapper or Jenkins tool config
+                bat 'mvn -B clean test -DsuiteXmlFile=testng.xml'
             }
         }
     }
 
     post {
         always {
-            // Publish test results (JUnit-compatible XML from TestNG via Surefire)
+            // Publish TestNG results (converted to JUnit format by Surefire)
             junit allowEmptyResults: true, testResults: 'target/surefire-reports/*.xml'
 
-            // Archive any HTML reports
+            // Archive TestNG HTML reports
             archiveArtifacts artifacts: 'target/surefire-reports/*.html', allowEmptyArchive: true
         }
 
