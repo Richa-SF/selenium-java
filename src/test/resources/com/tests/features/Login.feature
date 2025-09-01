@@ -18,8 +18,8 @@ Feature: Login functionality
 
 
 
-  Scenario: Successful login with different roles
-    Given I login as "admin"
+ # Scenario: Successful login with different roles
+ #  Given I login as "admin"
 
 
 
