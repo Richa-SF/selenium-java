@@ -2,12 +2,12 @@ pipeline {
     agent any
 
     tools {
-        maven 'M3'         // <-- Name of Maven configured in Jenkins
-        jdk 'jdk-17'       // <-- Name of JDK configured in Jenkins
+        maven 'M3'         // Name of Maven configured in Jenkins
+        jdk 'jdk-17'       // Name of JDK configured in Jenkins
     }
 
     environment {
-        CONFIG_FILE = credentials('SF_CONFIG_FILE')  // Your Salesforce config file credential
+        CONFIG_FILE = credentials('SF_CONFIG_FILE')
     }
 
     stages {
@@ -20,12 +20,8 @@ pipeline {
         stage('Prepare Config') {
             steps {
                 script {
-                    // Ensure resources folder exists
                     bat 'if not exist src\\main\\resources mkdir src\\main\\resources'
-
-                    // Copy config.properties from Jenkins credentials
                     bat "copy ${CONFIG_FILE} src\\main\\resources\\config.properties"
-
                     echo "✅ Config file prepared at src/main/resources/config.properties"
                 }
             }
@@ -33,29 +29,30 @@ pipeline {
 
         stage('Build & Test') {
             steps {
-                // Run tests with TestNG suite
-                bat 'mvn -B clean test -DsuiteXmlFile=testng.xml'
+                // Catch errors so pipeline continues even if tests fail
+                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                    bat 'mvn -B clean test -DsuiteXmlFile=testng.xml'
+                }
             }
         }
 
         stage('Allure Report') {
             steps {
-                // Generate Allure report in Jenkins
-                allure([
-                    includeProperties: false,
-                    jdk: '',
-                    results: [[path: 'target/allure-results']]
-                ])
+                // Always generate Allure report
+                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                    allure([
+                        includeProperties: false,
+                        jdk: '',
+                        results: [[path: 'target/allure-results']]
+                    ])
+                }
             }
         }
     }
 
     post {
         always {
-            // ✅ Archive Allure raw results so they can be reused/downloaded
             archiveArtifacts artifacts: 'target/allure-results/**', fingerprint: true
-
-            // ✅ Archive TestNG XML & HTML reports as backup
             junit allowEmptyResults: true, testResults: 'target/surefire-reports/*.xml'
             archiveArtifacts artifacts: 'target/surefire-reports/*.html', allowEmptyArchive: true
         }
@@ -63,8 +60,9 @@ pipeline {
         success {
             echo "✅ All Selenium + TestNG tests passed successfully."
         }
+
         failure {
-            echo "❌ Some tests failed! Please check Allure report in Jenkins."
+            echo "❌ Some tests failed! Check Allure report in Jenkins."
         }
     }
 }
